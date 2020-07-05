@@ -16,7 +16,7 @@
         android:id="@+id/signInFragment"
         android:name="com.nikasov.firebasechat.ui.fragment.signin.SignInFragment"
         android:label="main_fragment"
-        tools:layout="@layout/main_sign_in" >
+        tools:layout="@layout/fragment_sign_in" >
     </fragment>
 
     <fragment

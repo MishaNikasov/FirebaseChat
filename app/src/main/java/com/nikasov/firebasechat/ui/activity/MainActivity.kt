@@ -9,6 +9,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.GoogleAuthProvider
 import com.nikasov.firebasechat.R
 import com.nikasov.firebasechat.common.Const.GOOGLE_SIGN_IN_REQUEST

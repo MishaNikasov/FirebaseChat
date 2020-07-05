@@ -5,28 +5,30 @@ import android.util.Patterns
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.nikasov.firebasechat.R
 import com.nikasov.firebasechat.common.Const.GOOGLE_SIGN_IN_REQUEST
+import com.nikasov.firebasechat.ui.activity.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.main_sign_in.*
+import kotlinx.android.synthetic.main.fragment_sign_in.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import timber.log.Timber
 import java.lang.Exception
-import java.util.regex.Pattern
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SignInFragment : Fragment(R.layout.main_sign_in) {
+class SignInFragment : Fragment(R.layout.fragment_sign_in) {
 
-    private val viewModel: SignInViewModel by viewModels()
+    private val viewModel: AuthViewModel by viewModels()
+    private var isLogInState : MutableLiveData<Boolean> = MutableLiveData(false)
 
     @Inject
     lateinit var auth : FirebaseAuth
@@ -39,14 +41,41 @@ class SignInFragment : Fragment(R.layout.main_sign_in) {
     }
 
     private fun initUi() {
+
+        logIn.setOnClickListener {
+            isLogInState.postValue(!isLogInState.value!!)
+        }
+
+        isLogInState.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                motionLayout.transitionToState(R.id.logIn)
+                signInBtn.text = resources.getString(R.string.login)
+                signInGoogle.text = resources.getString(R.string.login_with_google)
+                logIn.text = resources.getString(R.string.signin)
+            } else {
+                motionLayout.transitionToState(R.id.signIn)
+                signInBtn.text = resources.getString(R.string.signin)
+                signInGoogle.text = resources.getString(R.string.signin_with_google)
+                logIn.text = resources.getString(R.string.login)
+            }
+        })
+
         signInBtn.setOnClickListener {
             signIn()
         }
         signInGoogle.setOnClickListener {
             signInByGoogle()
         }
-        logIn.setOnClickListener {
-//            findNavController().navigate()
+    }
+
+    private fun validateName(): Boolean {
+        val nameTxt = nameInput.text.toString()
+        return if (nameTxt.isEmpty()) {
+            textInputName.error = "Field can't be empty"
+            false
+        } else {
+            textInputName.error = null
+            true
         }
     }
 
@@ -83,18 +112,16 @@ class SignInFragment : Fragment(R.layout.main_sign_in) {
     }
 
     private fun signIn() {
-        if (validateEmail() && validatePassword()) {
-            CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    auth.createUserWithEmailAndPassword(
-                        emailInput.text.toString(),
-                        passwordInput.text.toString()
-                    ).await()
-                    findNavController().navigate(R.id.toProfileFragment)
-                } catch (e : Exception) {
-                    
-                }
-            }
+        if (!isLogInState.value!! && validateName() && validateEmail() && validatePassword()) {
+            viewModel.signInWithEmail(
+                emailInput.text.toString(),
+                passwordInput.text.toString()
+            )
+        } else if (isLogInState.value!! && validateEmail() && validatePassword()) {
+            viewModel.logInWithEmail(
+                emailInput.text.toString(),
+                passwordInput.text.toString()
+            )
         }
     }
 
@@ -102,5 +129,13 @@ class SignInFragment : Fragment(R.layout.main_sign_in) {
         signInOption.signInIntent.also {
             requireActivity().startActivityForResult(it, GOOGLE_SIGN_IN_REQUEST)
         }
+    }
+
+    private fun showAlert(message: String?) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Something wrong")
+            .setMessage(message)
+            .setPositiveButton("OK") { dialog, which -> }
+            .show()
     }
 }

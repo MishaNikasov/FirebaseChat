@@ -29,4 +29,20 @@ class AuthViewModel @ViewModelInject constructor(
             setCurrentUser()
         }
     }
+
+    fun signInWithEmail(email : String, password : String) {
+        viewModelScope.launch {
+            currentUser.postValue(Resource.Loading())
+            authRepository.signInWithEmail(email, password)
+            setCurrentUser()
+        }
+    }
+
+    fun logInWithEmail(email : String, password : String) {
+        viewModelScope.launch {
+            currentUser.postValue(Resource.Loading())
+            authRepository.logInWithEmail(email, password)
+            setCurrentUser()
+        }
+    }
 }
