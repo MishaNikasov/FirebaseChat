@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/signInFragment">
+
+    <action
+        android:id="@+id/toProfileFragment"
+        app:popUpTo="@+id/profileFragment"
+        app:popUpToInclusive="true"
+        app:destination="@id/profileFragment" />
+
+    <fragment
+        android:id="@+id/signInFragment"
+        android:name="com.nikasov.firebasechat.ui.fragment.signin.SignInFragment"
+        android:label="main_fragment"
+        tools:layout="@layout/main_sign_in" >
+    </fragment>
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.nikasov.firebasechat.ui.fragment.profile.ProfileFragment"
+        android:label="ProfileFragment" />
+
+</navigation>
