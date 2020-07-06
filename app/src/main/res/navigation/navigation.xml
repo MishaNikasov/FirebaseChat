@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation"
-    app:startDestination="@id/signInFragment">
+    app:startDestination="@id/authFragment">
 
     <action
         android:id="@+id/toProfileFragment"
@@ -12,11 +12,17 @@
         app:popUpToInclusive="true"
         app:destination="@id/profileFragment" />
 
+    <action
+        android:id="@+id/toAuthFragment"
+        app:popUpTo="@+id/profileFragment"
+        app:popUpToInclusive="true"
+        app:destination="@id/authFragment" />
+
     <fragment
-        android:id="@+id/signInFragment"
-        android:name="com.nikasov.firebasechat.ui.fragment.signin.SignInFragment"
+        android:id="@+id/authFragment"
+        android:name="com.nikasov.firebasechat.ui.fragment.auth.AuthFragment"
         android:label="main_fragment"
-        tools:layout="@layout/fragment_sign_in" >
+        tools:layout="@layout/fragment_auth" >
     </fragment>
 
     <fragment

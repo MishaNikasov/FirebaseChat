@@ -5,14 +5,22 @@
     android:id="@+id/motionLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/average_padding"
-    app:layoutDescription="@xml/main_sign_in_scene"
-    tools:context=".ui.fragment.signin.SignInFragment">
+    app:layoutDescription="@xml/main_sign_up_scene"
+    tools:context=".ui.fragment.auth.AuthFragment">
+
+    <include
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        android:id="@+id/loadScreen"
+        layout="@layout/view_loading"/>
 
     <com.google.android.material.textfield.TextInputLayout
+        android:layout_marginStart="@dimen/big_padding"
+        android:layout_marginEnd="@dimen/big_padding"
+        android:layout_width="0dp"
         android:id="@+id/textInputName"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/colorPrimary"
         app:boxBackgroundMode="outline"
@@ -31,9 +39,11 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
+        android:layout_marginStart="@dimen/big_padding"
+        android:layout_marginEnd="@dimen/big_padding"
+        android:layout_width="0dp"
         android:id="@+id/textInputEmail"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/colorPrimary"
         app:boxBackgroundMode="outline"
@@ -53,9 +63,11 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
+        android:layout_marginStart="@dimen/big_padding"
+        android:layout_marginEnd="@dimen/big_padding"
+        android:layout_width="0dp"
         android:id="@+id/textInputPassword"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/colorPrimary"
         app:boxBackgroundMode="outline"
@@ -76,9 +88,12 @@
 
 
     <Button
-        android:id="@+id/signInBtn"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:textAllCaps="false"
+        android:layout_marginStart="@dimen/big_padding"
+        android:layout_marginEnd="@dimen/big_padding"
         android:layout_width="0dp"
+        android:id="@+id/signUpBtn"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/basic_margin"
         android:padding="@dimen/average_padding"
@@ -88,21 +103,25 @@
         app:layout_constraintTop_toBottomOf="@+id/textInputPassword" />
 
     <Button
-        android:id="@+id/signInGoogle"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
+        android:textAllCaps="false"
+        android:layout_marginStart="@dimen/big_padding"
+        android:layout_marginEnd="@dimen/big_padding"
         android:layout_width="0dp"
+        android:id="@+id/signUpGoogle"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/basic_margin"
         android:padding="@dimen/average_padding"
         android:text="@string/signin_with_google"
-        app:icon="@android:drawable/gallery_thumb"
-        app:iconSize="15dp"
+        android:drawableTint="@color/colorPrimary"
+        app:icon="@drawable/ic_google"
+        app:iconSize="18dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/signInBtn" />
+        app:layout_constraintTop_toBottomOf="@+id/signUpBtn" />
 
     <Button
-        android:id="@+id/logIn"
+        android:id="@+id/stateBtn"
         style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

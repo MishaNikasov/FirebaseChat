@@ -8,18 +8,6 @@
     android:layout_height="match_parent"
     tools:context=".ui.activity.MainActivity">
 
-    <FrameLayout
-        android:background="@color/colorBg"
-        android:id="@+id/loadingScreen"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <com.google.android.material.progressindicator.ProgressIndicator
-            android:layout_gravity="center"
-            style="@style/Widget.MaterialComponents.ProgressIndicator.Circular.Indeterminate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-    </FrameLayout>
-
     <fragment
         android:id="@+id/hostFragment"
         android:name="androidx.navigation.fragment.NavHostFragment"

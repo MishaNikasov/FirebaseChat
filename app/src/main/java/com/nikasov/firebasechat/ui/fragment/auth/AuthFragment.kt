@@ -1,37 +1,41 @@
-package com.nikasov.firebasechat.ui.fragment.signin
+package com.nikasov.firebasechat.ui.fragment.auth
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Patterns
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.nikasov.firebasechat.R
+import com.nikasov.firebasechat.common.Const
 import com.nikasov.firebasechat.common.Const.GOOGLE_SIGN_IN_REQUEST
-import com.nikasov.firebasechat.ui.activity.AuthViewModel
+import com.nikasov.firebasechat.data.user.Profile
+import com.nikasov.firebasechat.util.Resource
+import com.squareup.okhttp.Dispatcher
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_sign_in.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.android.synthetic.main.fragment_auth.*
+import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
+import timber.log.Timber
 import java.lang.Exception
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SignInFragment : Fragment(R.layout.fragment_sign_in) {
+class AuthFragment : Fragment(R.layout.fragment_auth) {
 
     private val viewModel: AuthViewModel by viewModels()
     private var isLogInState : MutableLiveData<Boolean> = MutableLiveData(false)
 
-    @Inject
-    lateinit var auth : FirebaseAuth
     @Inject
     lateinit var signInOption : GoogleSignInClient
 
@@ -41,29 +45,47 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
     }
 
     private fun initUi() {
+        viewModel.setCurrentUser()
+        viewModel.currentUser.observe(viewLifecycleOwner, Observer { resource ->
+            when (resource) {
+                is Resource.Loading -> {
+                    loading(true)
+                }
+                is Resource.Success -> {
+                    loading(false)
+                    resource.data?.let {
+                        goToProfile()
+                    }
+                }
+                is Resource.Error -> {
+                    loading(false)
+                    showAlert(resource.message)
+                }
+            }
+        })
 
-        logIn.setOnClickListener {
+        stateBtn.setOnClickListener {
             isLogInState.postValue(!isLogInState.value!!)
         }
 
         isLogInState.observe(viewLifecycleOwner, Observer {
             if (it) {
-                motionLayout.transitionToState(R.id.logIn)
-                signInBtn.text = resources.getString(R.string.login)
-                signInGoogle.text = resources.getString(R.string.login_with_google)
-                logIn.text = resources.getString(R.string.signin)
+                motionLayout.transitionToState(R.id.stateBtn)
+                signUpBtn.text = resources.getString(R.string.login)
+                signUpGoogle.text = resources.getString(R.string.login_with_google)
+                stateBtn.text = resources.getString(R.string.signin)
             } else {
-                motionLayout.transitionToState(R.id.signIn)
-                signInBtn.text = resources.getString(R.string.signin)
-                signInGoogle.text = resources.getString(R.string.signin_with_google)
-                logIn.text = resources.getString(R.string.login)
+                motionLayout.transitionToState(R.id.signUp)
+                signUpBtn.text = resources.getString(R.string.signin)
+                signUpGoogle.text = resources.getString(R.string.signin_with_google)
+                stateBtn.text = resources.getString(R.string.login)
             }
         })
 
-        signInBtn.setOnClickListener {
-            signIn()
+        signUpBtn.setOnClickListener {
+            registerUser()
         }
-        signInGoogle.setOnClickListener {
+        signUpGoogle.setOnClickListener {
             signInByGoogle()
         }
     }
@@ -111,9 +133,10 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
         }
     }
 
-    private fun signIn() {
+    private fun registerUser() {
         if (!isLogInState.value!! && validateName() && validateEmail() && validatePassword()) {
-            viewModel.signInWithEmail(
+            viewModel.signUpWithEmail(
+                nameInput.text.toString(),
                 emailInput.text.toString(),
                 passwordInput.text.toString()
             )
@@ -127,7 +150,41 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
 
     private fun signInByGoogle() {
         signInOption.signInIntent.also {
-            requireActivity().startActivityForResult(it, GOOGLE_SIGN_IN_REQUEST)
+            startActivityForResult(it, GOOGLE_SIGN_IN_REQUEST)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == GOOGLE_SIGN_IN_REQUEST) {
+            try {
+                val account = GoogleSignIn.getSignedInAccountFromIntent(data).result
+                account?.let {
+                    googleAuthToFirebase(it)
+                }
+            } catch (e : Exception) {
+                Timber.d(e.localizedMessage)
+            }
+        }
+    }
+
+    private fun googleAuthToFirebase(signInAccount: GoogleSignInAccount) {
+        val credentials = GoogleAuthProvider.getCredential(signInAccount.idToken, null)
+        viewModel.signInWithGoogle(credentials)
+    }
+
+    private fun goToProfile() {
+        findNavController().apply {
+            popBackStack()
+            navigate(R.id.toProfileFragment)
+        }
+    }
+
+    private fun loading (isShow : Boolean) {
+        if (isShow) {
+            loadScreen.visibility = View.VISIBLE
+        } else {
+            loadScreen.visibility = View.INVISIBLE
         }
     }
 
@@ -135,7 +192,7 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Something wrong")
             .setMessage(message)
-            .setPositiveButton("OK") { dialog, which -> }
+            .setPositiveButton("OK") { _, _ -> }
             .show()
     }
 }

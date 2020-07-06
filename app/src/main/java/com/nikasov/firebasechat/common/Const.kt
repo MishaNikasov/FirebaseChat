@@ -7,4 +7,6 @@ object Const {
 
     const val NAME_INTENT = "name"
     const val PASSWORD_INTENT = "password"
+
+    const val PROFILE_COLLECTION = "profiles"
 }
