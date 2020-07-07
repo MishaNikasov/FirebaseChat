@@ -8,6 +8,8 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseUser
 import com.nikasov.firebasechat.R
+import com.nikasov.firebasechat.data.user.Profile
+import com.nikasov.firebasechat.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_profile.*
 
@@ -26,17 +28,34 @@ class ProfileFragment : Fragment (R.layout.fragment_profile) {
         logOutBtn.setOnClickListener {
             logOut()
         }
+        chatBtn.setOnClickListener {
+            findNavController().apply {
+                navigate(R.id.action_profileFragment_to_chatFragment)
+            }
+        }
     }
 
     private fun setUpProfile() {
-        profileViewModel.getProfileInfo()
+        profileViewModel.getProfile()
         profileViewModel.profile.observe(viewLifecycleOwner, Observer {user ->
-            updateUi(user)
+            when (user){
+                is Resource.Success -> {
+                    user.data?.let {
+                        updateUi(user.data)
+                    }
+                }
+                is Resource.Error -> {
+
+                }
+                is Resource.Loading -> {
+
+                }
+            }
         })
     }
 
-    private fun updateUi(user : FirebaseUser) {
-        name.text = user.displayName
+    private fun updateUi(profile : Profile) {
+        name.text = profile.name
     }
 
     private fun logOut() {

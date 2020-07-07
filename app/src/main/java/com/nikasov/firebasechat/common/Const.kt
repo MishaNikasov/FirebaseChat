@@ -9,4 +9,6 @@ object Const {
     const val PASSWORD_INTENT = "password"
 
     const val PROFILE_COLLECTION = "profiles"
+    const val CHAT_COLLECTION = "messages"
+
 }

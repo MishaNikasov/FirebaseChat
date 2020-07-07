@@ -20,46 +20,58 @@ class AuthViewModel @ViewModelInject constructor(
     private val profileRepository: ProfileRepository
 ): ViewModel(){
 
-    var currentUser : MutableLiveData<Resource<FirebaseUser?>> = MutableLiveData()
+    var currentUser : MutableLiveData<Resource<String>> = MutableLiveData()
 
-    fun setCurrentUser() {
-        currentUser.postValue(Resource.Success(auth.currentUser))
+    fun setCurrentUser(resource: Resource.Success<String>? = null) {
+        if (resource != null) {
+            currentUser.postValue(resource)
+        } else {
+            if (auth.currentUser != null) {
+                currentUser.postValue(Resource.Success(auth.currentUser!!.uid))
+            }
+        }
     }
 
     fun signInWithGoogle (googleAuthCredential : AuthCredential) {
+        currentUser.postValue(Resource.Loading())
         viewModelScope.launch {
             setUser(authRepository.firebaseLogInWithGoogle(googleAuthCredential))
         }
     }
 
     fun signUpWithEmail(name: String, email : String, password : String) {
+        currentUser.postValue(Resource.Loading())
         viewModelScope.launch {
             setUser(authRepository.signUpWithEmail(name, email, password))
         }
     }
 
     fun logInWithEmail(email : String, password : String) {
+        currentUser.postValue(Resource.Loading())
         viewModelScope.launch {
             setUser(authRepository.logInWithEmail(email, password))
         }
     }
 
     private fun setUser(user : AuthResource<Profile>) {
-        currentUser.postValue(Resource.Loading())
         when (user) {
             is AuthResource.SignUp -> {
-                user.data?.let {
+                user.data?.let { profile ->
                     viewModelScope.launch {
-                        profileRepository.saveProfile(user.data)
-                        setCurrentUser()
+                        profileRepository.saveProfile(profile)
+                        setCurrentUser(Resource.Success(profile.uid!!))
                     }
                 }
             }
             is AuthResource.LogIn -> {
-                setCurrentUser()
+                user.id?.let {id ->
+                    setCurrentUser(Resource.Success(id))
+                }
             }
             is AuthResource.Error -> {
-                currentUser.postValue(Resource.Error(user.message!!))
+                user.message?.let { message ->
+                    currentUser.postValue(Resource.Error(message))
+                }
             }
         }
     }

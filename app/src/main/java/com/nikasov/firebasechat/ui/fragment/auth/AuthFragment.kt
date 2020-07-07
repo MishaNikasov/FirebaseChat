@@ -14,18 +14,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import com.nikasov.firebasechat.R
-import com.nikasov.firebasechat.common.Const
 import com.nikasov.firebasechat.common.Const.GOOGLE_SIGN_IN_REQUEST
-import com.nikasov.firebasechat.data.user.Profile
 import com.nikasov.firebasechat.util.Resource
-import com.squareup.okhttp.Dispatcher
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_auth.*
-import kotlinx.coroutines.*
-import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 import java.lang.Exception
 import javax.inject.Inject
@@ -53,9 +46,12 @@ class AuthFragment : Fragment(R.layout.fragment_auth) {
                 }
                 is Resource.Success -> {
                     loading(false)
-                    resource.data?.let {
-                        goToProfile()
+                    resource.data?.let { uid ->
+                        goToProfile(uid)
                     }
+                }
+                is Resource.Empty -> {
+                    loading(false)
                 }
                 is Resource.Error -> {
                     loading(false)
@@ -173,7 +169,7 @@ class AuthFragment : Fragment(R.layout.fragment_auth) {
         viewModel.signInWithGoogle(credentials)
     }
 
-    private fun goToProfile() {
+    private fun goToProfile(uid : String) {
         findNavController().apply {
             popBackStack()
             navigate(R.id.toProfileFragment)

@@ -3,26 +3,27 @@ package com.nikasov.firebasechat.ui.fragment.profile
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
+import com.nikasov.firebasechat.data.repository.ProfileRepository
+import com.nikasov.firebasechat.data.user.Profile
+import com.nikasov.firebasechat.util.Resource
+import kotlinx.coroutines.launch
 
 class ProfileViewModel @ViewModelInject constructor(
-    private val firebaseAuth: FirebaseAuth
+    private val profileRepository: ProfileRepository,
+    private val auth: FirebaseAuth
 ) : ViewModel(){
 
+    val profile : MutableLiveData<Resource<Profile>> = MutableLiveData()
 
-    val profile : MutableLiveData<FirebaseUser> = MutableLiveData()
-
-    fun updateProfile() {
-
-    }
-
-    fun getProfileInfo() {
-        profile.postValue(firebaseAuth.currentUser)
+    fun getProfile() {
+        viewModelScope.launch {
+            profile.postValue(Resource.Success(profileRepository.getProfile()))
+        }
     }
 
     fun logOut() {
-        firebaseAuth.signOut()
+        auth.signOut()
     }
-
 }
