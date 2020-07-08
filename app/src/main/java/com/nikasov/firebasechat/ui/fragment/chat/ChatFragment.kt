@@ -24,15 +24,18 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel.setCollection(args.profileId, args.dialogId)
         initUi()
     }
 
     private fun setUpList() {
-        messageAdapter = MessageAdapter(args.uid)
+
+        messageAdapter = MessageAdapter(args.profileId)
         messageRecycler.apply {
             adapter = messageAdapter
             (layoutManager as LinearLayoutManager).stackFromEnd = true
         }
+
         viewModel.messages.observe(viewLifecycleOwner, Observer { resource ->
             when (resource) {
                 is Resource.Success -> {
@@ -42,6 +45,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                 }
             }
         })
+
         viewModel.subscribeToMessages()
     }
 

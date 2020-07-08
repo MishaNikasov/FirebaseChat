@@ -16,19 +16,11 @@ class ProfileRepository @Inject constructor(
 
     private val profileCollection = Firebase.firestore.collection(Const.PROFILE_COLLECTION)
 
-    suspend fun saveProfile(profile: Profile) {
-        try {
-            profileCollection.add(profile).await()
-        } catch (e: Exception) {
-
-        }
-    }
-
-    suspend fun getProfile(uid: String) : Profile{
+    suspend fun getProfile(profileId: String) : Profile {
         val profileQuery = profileCollection
-            .whereEqualTo("uid", uid)
+            .document(profileId)
             .get()
             .await()
-        return profileQuery.first().toObject()
+        return profileQuery.toObject<Profile>()!!
     }
 }

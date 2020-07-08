@@ -9,4 +9,5 @@ sealed class Resource<T> (
     class Empty<T> (data : T? = null) : Resource<T>(data)
     class Error<T> (message: String?, data: T? = null) : Resource<T>(data, message)
     class Loading<T> : Resource<T>()
+    class PreLoading<T> : Resource<T>()
 }

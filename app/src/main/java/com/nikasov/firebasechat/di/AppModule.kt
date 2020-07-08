@@ -7,6 +7,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.nikasov.firebasechat.R
 import com.nikasov.firebasechat.common.ResourceProvider
+import com.nikasov.firebasechat.util.Prefs
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,6 +21,9 @@ class AppModule {
     @Singleton
     @Provides
     fun provideFirebaseAuth() : FirebaseAuth = FirebaseAuth.getInstance()
+    @Singleton
+    @Provides
+    fun providePrefs(@ApplicationContext context: Context) : Prefs = Prefs(context)
     @Provides
     @Singleton
     fun provideResourceProvider (@ApplicationContext context: Context) = ResourceProvider(context)

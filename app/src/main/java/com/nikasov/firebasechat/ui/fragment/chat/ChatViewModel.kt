@@ -17,22 +17,34 @@ class ChatViewModel @ViewModelInject constructor(
     private val chatRepository: ChatRepository
 ): ViewModel() {
 
-    private val chatCollection = Firebase.firestore.collection(Const.MESSAGE_COLLECTION)
-
     var messages : MutableLiveData<Resource<List<Message>>> = MutableLiveData()
+
+    lateinit var profileId : String
+    lateinit var dialogId : String
+
+    fun setCollection (profileId : String, dialogId : String) {
+        chatRepository.setCollection(profileId, dialogId)
+        this.profileId = profileId
+        this.dialogId = dialogId
+    }
 
     fun addMessage(messageText: String) {
         chatRepository.addMessage(
             Message(
-                auth.uid!!,
+                profileId,
                 messageText
             )
         )
     }
 
     fun subscribeToMessages() {
+        val messageCollection =
+            Firebase.firestore.collection(Const.PROFILE_COLLECTION)
+            .document(profileId).collection(Const.DIALOG_COLLECTION)
+            .document(dialogId).collection(Const.DIALOG_COLLECTION)
+
         val messagesArray = arrayListOf<Message>()
-        chatCollection.orderBy("date").addSnapshotListener { query, exception ->
+        messageCollection.orderBy("date").addSnapshotListener { query, exception ->
             exception?.let {
                 messages.postValue(Resource.Error(exception.localizedMessage))
             }

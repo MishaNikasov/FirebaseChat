@@ -16,8 +16,7 @@ import kotlinx.coroutines.launch
 
 class AuthViewModel @ViewModelInject constructor(
     private val auth : FirebaseAuth,
-    private val authRepository: AuthRepository,
-    private val profileRepository: ProfileRepository
+    private val authRepository: AuthRepository
 ): ViewModel(){
 
     var currentUser : MutableLiveData<Resource<String>> = MutableLiveData()
@@ -25,10 +24,6 @@ class AuthViewModel @ViewModelInject constructor(
     fun setCurrentUser(resource: Resource.Success<String>? = null) {
         if (resource != null) {
             currentUser.postValue(resource)
-        } else {
-            if (auth.currentUser != null) {
-                currentUser.postValue(Resource.Success(auth.currentUser!!.uid))
-            }
         }
     }
 
@@ -56,11 +51,8 @@ class AuthViewModel @ViewModelInject constructor(
     private fun setUser(user : AuthResource<Profile>) {
         when (user) {
             is AuthResource.SignUp -> {
-                user.data?.let { profile ->
-                    viewModelScope.launch {
-                        profileRepository.saveProfile(profile)
-                        setCurrentUser(Resource.Success(profile.uid!!))
-                    }
+                user.id?.let {id ->
+                    setCurrentUser(Resource.Success(id))
                 }
             }
             is AuthResource.LogIn -> {
@@ -75,4 +67,5 @@ class AuthViewModel @ViewModelInject constructor(
             }
         }
     }
+
 }

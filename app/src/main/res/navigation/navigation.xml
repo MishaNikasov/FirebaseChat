@@ -8,10 +8,11 @@
 
     <action
         android:id="@+id/action_authFragment_to_profileFragment"
-        app:destination="@id/profileFragment" />
+        app:destination="@id/dialogFragment" />
+
     <action
         android:id="@+id/toAuthFragment"
-        app:popUpTo="@+id/profileFragment"
+        app:popUpTo="@+id/dialogFragment"
         app:popUpToInclusive="true"
         app:destination="@id/authFragment" />
 
@@ -23,14 +24,16 @@
     </fragment>
 
     <fragment
-        android:id="@+id/profileFragment"
-        android:name="com.nikasov.firebasechat.ui.fragment.profile.ProfileFragment"
+        android:id="@+id/dialogFragment"
+        android:name="com.nikasov.firebasechat.ui.fragment.profile.DialogFragment"
         android:label="Profile" >
         <action
             android:id="@+id/action_profileFragment_to_chatFragment"
             app:destination="@id/chatFragment" />
         <argument
-            android:name="uid"
+            app:nullable="true"
+            android:defaultValue="@null"
+            android:name="profileId"
             app:argType="string" />
     </fragment>
 
@@ -39,13 +42,11 @@
         android:name="com.nikasov.firebasechat.ui.fragment.chat.ChatFragment"
         android:label="Chat" >
         <argument
-            android:name="uid"
+            android:name="profileId"
             app:argType="string" />
         <argument
-            android:name="chatId"
-            android:defaultValue="@null"
-            app:argType="string"
-            app:nullable="true" />
+            android:name="dialogId"
+            app:argType="string" />
     </fragment>
 
 </navigation>

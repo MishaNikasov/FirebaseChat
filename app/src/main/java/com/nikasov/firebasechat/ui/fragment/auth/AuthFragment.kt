@@ -1,6 +1,8 @@
 package com.nikasov.firebasechat.ui.fragment.auth
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Patterns
 import android.view.View
@@ -15,7 +17,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.GoogleAuthProvider
 import com.nikasov.firebasechat.R
+import com.nikasov.firebasechat.common.Const
 import com.nikasov.firebasechat.common.Const.GOOGLE_SIGN_IN_REQUEST
+import com.nikasov.firebasechat.util.Prefs
 import com.nikasov.firebasechat.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_auth.*
@@ -31,6 +35,8 @@ class AuthFragment : Fragment(R.layout.fragment_auth) {
 
     @Inject
     lateinit var signInOption : GoogleSignInClient
+    @Inject
+    lateinit var prefs : Prefs
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -46,12 +52,10 @@ class AuthFragment : Fragment(R.layout.fragment_auth) {
                 }
                 is Resource.Success -> {
                     loading(false)
-                    resource.data?.let { uid ->
-                        goToProfile(uid)
+                    resource.data?.let { profileId ->
+                        goToDialogs(profileId)
+                        prefs.saveProfileIdToPreferences(profileId)
                     }
-                }
-                is Resource.Empty -> {
-                    loading(false)
                 }
                 is Resource.Error -> {
                     loading(false)
@@ -169,17 +173,10 @@ class AuthFragment : Fragment(R.layout.fragment_auth) {
         viewModel.signInWithGoogle(credentials)
     }
 
-    private fun goToProfile(uid : String) {
-        if (uid.isNotEmpty()) {
-            findNavController().apply {
-                popBackStack()
-                navigate(AuthFragmentDirections.actionAuthFragmentToProfileFragment(uid))
-            }
-        } else {
-            findNavController().apply {
-                popBackStack()
-                navigate(R.id.action_authFragment_to_profileFragment)
-            }
+    private fun goToDialogs(profileId : String) {
+        findNavController().apply {
+            popBackStack()
+            navigate(AuthFragmentDirections.actionAuthFragmentToProfileFragment(profileId))
         }
     }
 

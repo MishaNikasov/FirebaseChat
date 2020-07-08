@@ -25,14 +25,15 @@ class AuthRepository @Inject constructor(
     ) : AuthResource<Profile>{
         return try {
             firebaseAuth.signInWithCredential(googleAuthCredential).await()
-            if (checkIsExist(firebaseAuth.uid)){
-                AuthResource.LogIn(firebaseAuth.uid)
+            if (checkIsExist(firebaseAuth.uid) != null){
+                AuthResource.LogIn(checkIsExist(firebaseAuth.uid))
             } else {
-                AuthResource.SignUp(Profile(
+                saveProfile(Profile(
                     firebaseAuth.uid,
                     firebaseAuth.currentUser?.displayName.toString(),
                     firebaseAuth.currentUser?.email.toString()
                 ))
+                AuthResource.SignUp(checkIsExist(firebaseAuth.uid))
             }
         } catch (e: Exception) {
             AuthResource.Error(e.localizedMessage)
@@ -48,7 +49,7 @@ class AuthRepository @Inject constructor(
                 email,
                 password
             ).await()
-            AuthResource.LogIn(firebaseAuth.uid)
+            AuthResource.SignUp(checkIsExist(firebaseAuth.uid))
         } catch (e: Exception) {
             return AuthResource.Error(e.localizedMessage)
         }
@@ -64,20 +65,33 @@ class AuthRepository @Inject constructor(
                 email,
                 password
             ).await()
-            AuthResource.SignUp(Profile(firebaseAuth.uid, name, email))
+            saveProfile(Profile(firebaseAuth.uid, name, email))
+            AuthResource.SignUp(checkIsExist(firebaseAuth.uid))
         } catch (e: Exception) {
             return AuthResource.Error(e.localizedMessage)
         }
     }
 
-    private suspend fun checkIsExist(uid : String?) : Boolean{
+    suspend fun checkIsExist(uid : String?) : String? {
         return try {
             val profileQuery = profileCollection.whereEqualTo("uid", uid)
                 .get()
                 .await()
-            profileQuery.documents.first() != null
+            if (profileQuery.documents.first().toObject<Profile>() != null){
+                profileQuery.documents.first().toObject<Profile>()!!.id
+            } else {
+                null
+            }
         } catch (e : java.lang.Exception) {
-            false
+            null
+        }
+    }
+
+    private suspend fun saveProfile(profile: Profile) {
+        try {
+            profileCollection.add(profile).await()
+        } catch (e: java.lang.Exception) {
+
         }
     }
 }
