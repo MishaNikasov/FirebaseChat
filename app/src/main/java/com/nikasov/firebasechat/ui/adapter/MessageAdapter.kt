@@ -10,20 +10,21 @@ import com.nikasov.firebasechat.R
 import com.nikasov.firebasechat.data.chat.Message
 import kotlinx.android.synthetic.main.item_message.view.*
 
-class MessageAdapter(private val interaction: Interaction? = null) :
+class MessageAdapter(
+    private val userUid : String,
+    private val interaction: Interaction? = null
+) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Message>() {
-
+    private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Message>() {
         override fun areItemsTheSame(oldItem: Message, newItem: Message): Boolean {
-            return oldItem == newItem
+            return oldItem.id == newItem.id
         }
-
         override fun areContentsTheSame(oldItem: Message, newItem: Message): Boolean {
-            return oldItem.date == newItem.date
+            return oldItem.id == newItem.id
         }
-
     }
+
     private val differ = AsyncListDiffer(this, DIFF_CALLBACK)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -40,7 +41,7 @@ class MessageAdapter(private val interaction: Interaction? = null) :
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is MessageViewHolder -> {
-                holder.bind(differ.currentList.get(position))
+                holder.bind(differ.currentList[position], userUid)
             }
         }
     }
@@ -58,8 +59,7 @@ class MessageAdapter(private val interaction: Interaction? = null) :
         itemView: View,
         private val interaction: Interaction?
     ) : RecyclerView.ViewHolder(itemView) {
-
-        fun bind(item: Message) = with(itemView) {
+        fun bind(item: Message, userUid : String) = with(itemView) {
             itemView.setOnClickListener {
                 interaction?.onItemSelected(adapterPosition, item)
             }

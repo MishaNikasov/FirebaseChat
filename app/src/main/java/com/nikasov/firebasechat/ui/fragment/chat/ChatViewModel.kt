@@ -17,7 +17,7 @@ class ChatViewModel @ViewModelInject constructor(
     private val chatRepository: ChatRepository
 ): ViewModel() {
 
-    private val chatCollection = Firebase.firestore.collection(Const.CHAT_COLLECTION)
+    private val chatCollection = Firebase.firestore.collection(Const.MESSAGE_COLLECTION)
 
     var messages : MutableLiveData<Resource<List<Message>>> = MutableLiveData()
 
@@ -32,11 +32,12 @@ class ChatViewModel @ViewModelInject constructor(
 
     fun subscribeToMessages() {
         val messagesArray = arrayListOf<Message>()
-        chatCollection.addSnapshotListener { query, exception ->
+        chatCollection.orderBy("date").addSnapshotListener { query, exception ->
             exception?.let {
                 messages.postValue(Resource.Error(exception.localizedMessage))
             }
             query?.let {
+                messagesArray.clear()
                 for (messageObject in query.documents) {
                     val message = messageObject.toObject<Message>()
                     message?.let {
@@ -47,5 +48,4 @@ class ChatViewModel @ViewModelInject constructor(
             }
         }
     }
-
 }

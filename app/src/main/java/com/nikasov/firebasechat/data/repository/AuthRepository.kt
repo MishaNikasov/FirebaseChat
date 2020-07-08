@@ -4,6 +4,7 @@ import android.content.Context
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.nikasov.firebasechat.common.Const
 import com.nikasov.firebasechat.data.user.Profile
@@ -17,17 +18,16 @@ class AuthRepository @Inject constructor(
     private val firebaseAuth: FirebaseAuth
 ) {
 
-    val profileCollection = Firebase.firestore.collection(Const.PROFILE_COLLECTION)
+    private val profileCollection = Firebase.firestore.collection(Const.PROFILE_COLLECTION)
 
     suspend fun firebaseLogInWithGoogle(
         googleAuthCredential: AuthCredential
     ) : AuthResource<Profile>{
         return try {
-            if (true){
-                firebaseAuth.signInWithCredential(googleAuthCredential).await()
+            firebaseAuth.signInWithCredential(googleAuthCredential).await()
+            if (checkIsExist(firebaseAuth.uid)){
                 AuthResource.LogIn(firebaseAuth.uid)
             } else {
-                firebaseAuth.signInWithCredential(googleAuthCredential).await()
                 AuthResource.SignUp(Profile(
                     firebaseAuth.uid,
                     firebaseAuth.currentUser?.displayName.toString(),
@@ -52,7 +52,7 @@ class AuthRepository @Inject constructor(
         } catch (e: Exception) {
             return AuthResource.Error(e.localizedMessage)
         }
-    }//todo: прокидывать айдишник в аутфраг что бы передать его аргументов в профиль
+    }
 
     suspend fun signUpWithEmail(
         name: String,
@@ -70,4 +70,14 @@ class AuthRepository @Inject constructor(
         }
     }
 
+    private suspend fun checkIsExist(uid : String?) : Boolean{
+        return try {
+            val profileQuery = profileCollection.whereEqualTo("uid", uid)
+                .get()
+                .await()
+            profileQuery.documents.first() != null
+        } catch (e : java.lang.Exception) {
+            false
+        }
+    }
 }

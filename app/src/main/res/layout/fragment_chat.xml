@@ -21,7 +21,7 @@
         android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/colorBgLight"
+        android:background="@color/colorStroke"
         app:layout_constraintBottom_toTopOf="@+id/bottomLayout" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -30,7 +30,7 @@
         android:gravity="center"
         android:padding="@dimen/basic_padding"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -39,21 +39,26 @@
         <EditText
             android:id="@+id/typeMessage"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/basic_margin"
             android:layout_weight="1"
             android:background="@drawable/type_message_bg"
-            android:padding="@dimen/basic_padding"
+            android:paddingStart="@dimen/average_padding"
+            android:paddingTop="@dimen/basic_padding"
+            android:paddingEnd="@dimen/average_padding"
+            android:paddingBottom="@dimen/basic_padding"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/sendBtn"
             app:layout_constraintStart_toStartOf="parent"
-            tools:layout_editor_absoluteY="8dp" />
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
+        <ImageButton
+            android:enabled="false"
             android:id="@+id/sendBtn"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:background="?selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_send"
+            android:src="@drawable/send_btn_state"
             android:text="send"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

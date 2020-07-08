@@ -24,10 +24,9 @@ class ProfileRepository @Inject constructor(
         }
     }
 
-    suspend fun getProfile() : Profile{
-        val whereId = auth.uid
+    suspend fun getProfile(uid: String) : Profile{
         val profileQuery = profileCollection
-            .whereEqualTo("uid", whereId!!)
+            .whereEqualTo("uid", uid)
             .get()
             .await()
         return profileQuery.first().toObject()

@@ -170,9 +170,16 @@ class AuthFragment : Fragment(R.layout.fragment_auth) {
     }
 
     private fun goToProfile(uid : String) {
-        findNavController().apply {
-            popBackStack()
-            navigate(R.id.toProfileFragment)
+        if (uid.isNotEmpty()) {
+            findNavController().apply {
+                popBackStack()
+                navigate(AuthFragmentDirections.actionAuthFragmentToProfileFragment(uid))
+            }
+        } else {
+            findNavController().apply {
+                popBackStack()
+                navigate(R.id.action_authFragment_to_profileFragment)
+            }
         }
     }
 
