@@ -1,6 +1,5 @@
 package com.nikasov.firebasechat.data.repository
 
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.nikasov.firebasechat.common.Const
@@ -12,14 +11,12 @@ import java.lang.Exception
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
-class DialogRepository @Inject constructor(
-    private val firebaseAuth: FirebaseAuth
-){
+class DialogRepository @Inject constructor(){
 
     private val profileCollection = Firebase.firestore.collection(Const.PROFILE_COLLECTION)
     private val dialogsCollection = Firebase.firestore.collection(Const.DIALOG_COLLECTION)
 
-    suspend fun addDialog(owner: String, member: String){
+    suspend fun addDialog(owner: String, member: String, memberName : String) : Resource<String?>{
         try {
             var id : String?
             val members : ArrayList<String> = arrayListOf()
@@ -29,11 +26,12 @@ class DialogRepository @Inject constructor(
                 add(member)
             }
 
-            dialogsCollection.add(Dialog(
-                members,
-                "TEST",
-                owner
-            )).also { doc ->
+            dialogsCollection.add(
+                Dialog(
+                    members,
+                    memberName,
+                    owner)
+            ).also { doc ->
                 doc.await()
                 id = doc.result?.id
                 members.forEach { member ->
@@ -44,13 +42,14 @@ class DialogRepository @Inject constructor(
                         .await()
                 }
             }
+            return Resource.Success(id)
         } catch (e: Exception) {
+            return Resource.Error(e.localizedMessage)
         }
     }
 
     suspend fun getDialogs(owner: String) : List<Dialog> {
         return try {
-
             val dialogs = arrayListOf<Dialog>()
             val dialogsIds =
                 profileCollection
@@ -67,7 +66,6 @@ class DialogRepository @Inject constructor(
                     .toObject<Dialog>()!!
                 )
             }
-
             return dialogs
         } catch (e: Exception) {
             emptyList()

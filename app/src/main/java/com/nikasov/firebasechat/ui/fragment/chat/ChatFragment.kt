@@ -24,12 +24,10 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.setCollection(args.dialogId)
         initUi()
     }
 
     private fun setUpList() {
-
         messageAdapter = MessageAdapter(viewModel.getCurrentId())
         messageRecycler.apply {
             adapter = messageAdapter
@@ -45,13 +43,33 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                 }
             }
         })
-
-        viewModel.subscribeToMessages()
     }
 
     private fun initUi() {
+
+        viewModel.loading.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Resource.Loading -> {
+                    enableChat(false)
+                }
+                is Resource.Empty -> {
+                    enableChat(true)
+                }
+                is Resource.Error -> {
+                    enableChat(false)
+                }
+            }
+        })
+
+        if (args.dialogId != null) {
+            viewModel.setExistingDialog(args.dialogId!!)
+        } else {
+            viewModel.checkIfDialogExist(args.memberId!!)
+        }
+
         sendBtn.isEnabled = false
         setUpList()
+
         sendBtn.setOnClickListener {
             viewModel.addMessage(typeMessage.text.toString())
             messageRecycler.smoothScrollToPosition(messageAdapter.itemCount)
@@ -59,6 +77,16 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         }
         typeMessage.doAfterTextChanged {
             sendBtn.isEnabled = typeMessage.text.isNotEmpty()
+        }
+    }
+
+    private fun enableChat(isEnable: Boolean) {
+        if (!isEnable) {
+            loadingScreen.visibility = View.VISIBLE
+            typeMessage.isEnabled = false
+        } else {
+            loadingScreen.visibility = View.GONE
+            typeMessage.isEnabled = true
         }
     }
 }

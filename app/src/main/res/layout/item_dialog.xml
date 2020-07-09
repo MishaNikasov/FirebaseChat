@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
-    android:minHeight="100dp"
+    android:minHeight="80dp"
     android:background="@drawable/ripple_grey"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -8,6 +8,7 @@
     android:layout_height="wrap_content">
 
     <ImageView
+        android:visibility="gone"
         android:padding="@dimen/basic_padding"
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
@@ -18,6 +19,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
+        android:layout_marginStart="@dimen/average_padding"
         android:orientation="vertical"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -27,6 +29,7 @@
         app:layout_constraintTop_toTopOf="@+id/imageView">
 
         <TextView
+            android:textSize="@dimen/text_average"
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -35,6 +38,7 @@
             android:textColor="@color/black"/>
 
         <TextView
+            android:visibility="gone"
             android:textSize="@dimen/text_small"
             android:id="@+id/lastMessage"
             android:layout_width="wrap_content"

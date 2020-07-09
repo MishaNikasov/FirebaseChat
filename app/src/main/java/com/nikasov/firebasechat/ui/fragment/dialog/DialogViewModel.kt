@@ -14,35 +14,14 @@ import com.nikasov.firebasechat.util.Resource
 import kotlinx.coroutines.launch
 
 class DialogViewModel @ViewModelInject constructor(
-    private val profileRepository: ProfileRepository,
     private val dialogRepository: DialogRepository,
-    private val auth: FirebaseAuth,
-    private val prefs: Prefs
+    prefs: Prefs
 ) : ViewModel(){
 
     val profile : MutableLiveData<Resource<Profile>> = MutableLiveData()
     val dialogs : MutableLiveData<Resource<List<Dialog>>> = MutableLiveData()
 
     private val currentProfileId = prefs.loadProfileId()
-
-    fun getProfile() {
-        viewModelScope.launch {
-            profile.postValue(
-                Resource.Success(
-                    profileRepository.getProfile(currentProfileId!!)
-                )
-            )
-        }
-    }
-
-    fun addDialog() {
-        viewModelScope.launch {
-            dialogRepository.addDialog(
-                currentProfileId!!,
-                "memberid"
-            )
-        }
-    }
 
     fun getDialogs() {
         viewModelScope.launch {
@@ -52,12 +31,4 @@ class DialogViewModel @ViewModelInject constructor(
         }
     }
 
-    fun logOut() {
-        auth.signOut()
-        prefs.clearUser()
-    }
-
-    fun getCurrentId(): String {
-        return prefs.loadProfileId() as String
-    }
 }

@@ -9,17 +9,5 @@ import javax.inject.Inject
 
 class ChatRepository @Inject constructor() {
 
-    private lateinit var messageCollection : CollectionReference
-
-    fun setCollection(dialogId : String) {
-        messageCollection =
-            Firebase.firestore
-            .collection(Const.DIALOG_COLLECTION)
-            .document(dialogId).collection(Const.MESSAGE_COLLECTION)
-    }
-
-    fun addMessage(message: Message) {
-        messageCollection.add(message)
-    }
 
 }

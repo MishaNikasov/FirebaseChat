@@ -25,36 +25,7 @@ class DialogFragment : Fragment (R.layout.fragment_dialogs) {
     }
 
     private fun setUpUi() {
-
-        setUpProfile()
         setUpDialogsList()
-
-        logOutBtn.setOnClickListener {
-            logOut()
-        }
-        chatBtn.setOnClickListener {
-            dialogViewModel.addDialog()
-        }
-        contactBtn.setOnClickListener {
-            findNavController().navigate(R.id.action_contactFragment_self)
-        }
-    }
-
-    private fun setUpProfile() {
-        dialogViewModel.getProfile()
-        dialogViewModel.profile.observe(viewLifecycleOwner, Observer { user ->
-            when (user){
-                is Resource.Success -> {
-                    user.data?.let {
-                        updateUi(user.data)
-                    }
-                }
-                is Resource.Error -> {
-                }
-                is Resource.Loading -> {
-                }
-            }
-        })
     }
 
     private fun setUpDialogsList() {
@@ -89,15 +60,4 @@ class DialogFragment : Fragment (R.layout.fragment_dialogs) {
         })
     }
 
-    private fun updateUi(profile : Profile) {
-        name.text = profile.name
-    }
-
-    private fun logOut() {
-        dialogViewModel.logOut()
-        findNavController().apply {
-            popBackStack()
-            navigate(R.id.toAuthFragment)
-        }
-    }
 }

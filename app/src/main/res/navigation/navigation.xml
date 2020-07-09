@@ -41,8 +41,15 @@
         android:name="com.nikasov.firebasechat.ui.fragment.chat.ChatFragment"
         android:label="Chat" >
         <argument
+            app:nullable="true"
+            android:defaultValue="@null"
             android:name="dialogId"
             app:argType="string" />
+        <argument
+            android:name="memberId"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
     </fragment>
     <fragment
         android:id="@+id/contactFragment"

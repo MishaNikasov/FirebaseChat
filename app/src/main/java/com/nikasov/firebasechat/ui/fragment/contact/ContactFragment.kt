@@ -55,7 +55,7 @@ class ContactFragment : Fragment(R.layout.fragment_contact) {
 
     fun openChat(member : String) {
         val action =
-            ContactFragmentDirections.actionContactFragmentToChatFragment(member)
+            ContactFragmentDirections.actionContactFragmentToChatFragment(null, member)
         findNavController().apply {
             navigate(action)
         }
