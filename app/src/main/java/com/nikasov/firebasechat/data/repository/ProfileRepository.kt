@@ -7,7 +7,6 @@ import com.google.firebase.ktx.Firebase
 import com.nikasov.firebasechat.common.Const
 import com.nikasov.firebasechat.data.user.Profile
 import kotlinx.coroutines.tasks.await
-import java.lang.Exception
 import javax.inject.Inject
 
 class ProfileRepository @Inject constructor(
@@ -22,5 +21,17 @@ class ProfileRepository @Inject constructor(
             .get()
             .await()
         return profileQuery.toObject<Profile>()!!
+    }
+
+    suspend fun getAllProfiles(): List<Profile> {
+        val profilesArray = arrayListOf<Profile>()
+
+        profileCollection.get().await().also { profiles ->
+            profiles.forEach { profile ->
+                profilesArray.add(profile.toObject())
+            }
+        }
+
+        return profilesArray
     }
 }

@@ -11,10 +11,11 @@ class ChatRepository @Inject constructor() {
 
     private lateinit var messageCollection : CollectionReference
 
-    fun setCollection(profileId : String, dialogId : String) {
-        messageCollection = Firebase.firestore.collection(Const.PROFILE_COLLECTION)
-            .document(profileId).collection(Const.DIALOG_COLLECTION)
-            .document(dialogId).collection(Const.DIALOG_COLLECTION)
+    fun setCollection(dialogId : String) {
+        messageCollection =
+            Firebase.firestore
+            .collection(Const.DIALOG_COLLECTION)
+            .document(dialogId).collection(Const.MESSAGE_COLLECTION)
     }
 
     fun addMessage(message: Message) {

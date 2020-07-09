@@ -176,7 +176,7 @@ class AuthFragment : Fragment(R.layout.fragment_auth) {
     private fun goToDialogs(profileId : String) {
         findNavController().apply {
             popBackStack()
-            navigate(AuthFragmentDirections.actionAuthFragmentToProfileFragment(profileId))
+            navigate(AuthFragmentDirections.actionAuthFragmentToProfileFragment())
         }
     }
 

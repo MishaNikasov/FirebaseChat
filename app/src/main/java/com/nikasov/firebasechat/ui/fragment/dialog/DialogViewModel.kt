@@ -1,4 +1,4 @@
-package com.nikasov.firebasechat.ui.fragment.profile
+package com.nikasov.firebasechat.ui.fragment.dialog
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
@@ -9,26 +9,27 @@ import com.nikasov.firebasechat.data.chat.Dialog
 import com.nikasov.firebasechat.data.repository.DialogRepository
 import com.nikasov.firebasechat.data.repository.ProfileRepository
 import com.nikasov.firebasechat.data.user.Profile
+import com.nikasov.firebasechat.util.Prefs
 import com.nikasov.firebasechat.util.Resource
 import kotlinx.coroutines.launch
 
 class DialogViewModel @ViewModelInject constructor(
     private val profileRepository: ProfileRepository,
     private val dialogRepository: DialogRepository,
-    private val auth: FirebaseAuth
+    private val auth: FirebaseAuth,
+    private val prefs: Prefs
 ) : ViewModel(){
 
     val profile : MutableLiveData<Resource<Profile>> = MutableLiveData()
     val dialogs : MutableLiveData<Resource<List<Dialog>>> = MutableLiveData()
 
-    private lateinit var currentProfileId : String
+    private val currentProfileId = prefs.loadProfileId()
 
-    fun getProfile(profileId : String) {
-        currentProfileId = profileId
+    fun getProfile() {
         viewModelScope.launch {
             profile.postValue(
                 Resource.Success(
-                    profileRepository.getProfile(profileId)
+                    profileRepository.getProfile(currentProfileId!!)
                 )
             )
         }
@@ -37,7 +38,8 @@ class DialogViewModel @ViewModelInject constructor(
     fun addDialog() {
         viewModelScope.launch {
             dialogRepository.addDialog(
-                currentProfileId
+                currentProfileId!!,
+                "memberid"
             )
         }
     }
@@ -45,12 +47,17 @@ class DialogViewModel @ViewModelInject constructor(
     fun getDialogs() {
         viewModelScope.launch {
             dialogs.postValue(Resource.Success(
-                dialogRepository.getDialogs(currentProfileId))
+                dialogRepository.getDialogs(currentProfileId!!))
             )
         }
     }
 
     fun logOut() {
         auth.signOut()
+        prefs.clearUser()
+    }
+
+    fun getCurrentId(): String {
+        return prefs.loadProfileId() as String
     }
 }

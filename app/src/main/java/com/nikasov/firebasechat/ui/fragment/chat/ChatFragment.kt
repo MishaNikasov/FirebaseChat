@@ -24,13 +24,13 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.setCollection(args.profileId, args.dialogId)
+        viewModel.setCollection(args.dialogId)
         initUi()
     }
 
     private fun setUpList() {
 
-        messageAdapter = MessageAdapter(args.profileId)
+        messageAdapter = MessageAdapter(viewModel.getCurrentId())
         messageRecycler.apply {
             adapter = messageAdapter
             (layoutManager as LinearLayoutManager).stackFromEnd = true

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:padding="@dimen/basic_padding"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TextView
+        android:padding="@dimen/basic_padding"
         android:id="@+id/name"
         android:textSize="@dimen/text_title"
         android:layout_width="wrap_content"
@@ -35,6 +35,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/logOutBtn" />
 
+    <Button
+        android:id="@+id/contactBtn"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Contact"
+        android:textAllCaps="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chatBtn" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/dialogRecycler"
         android:layout_width="match_parent"
@@ -43,6 +53,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chatBtn" />
+        app:layout_constraintTop_toBottomOf="@+id/contactBtn" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
