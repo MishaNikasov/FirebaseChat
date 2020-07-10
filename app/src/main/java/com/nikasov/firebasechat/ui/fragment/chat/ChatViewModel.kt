@@ -33,10 +33,18 @@ class ChatViewModel @ViewModelInject constructor(
     private lateinit var messageCollection : CollectionReference
 
     fun checkIfDialogExist(memberId : String) {
-        addNewDialog(memberId)
+        viewModelScope.launch {
+            val memberProfile = profileRepository.getProfile(profileId)
+            val ifExist = profileRepository.ifChatExist(profileId, memberId)
+            if (ifExist != null) {
+                setExistingDialog(ifExist)
+            } else {
+                addNewDialog(memberId)
+            }
+        }
     }
 
-    fun addNewDialog(memberId : String) {
+    private fun addNewDialog(memberId : String) {
         loading.postValue(Resource.Loading())
         viewModelScope.launch {
             val profile = profileRepository.getProfile(memberId)
@@ -47,8 +55,9 @@ class ChatViewModel @ViewModelInject constructor(
             ).let { res ->
                 when (res) {
                     is Resource.Success -> {
+                        profileRepository.addChatToProfile(prefs.loadProfileId()!!, memberId, res.data!!)
                         loading.postValue(Resource.Empty())
-                        setExistingDialog(res.data!!)
+                        setExistingDialog(res.data)
                     }
                     is Resource.Error -> {
                         loading.postValue(Resource.Error(res.message))

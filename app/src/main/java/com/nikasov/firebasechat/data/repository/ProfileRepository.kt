@@ -14,6 +14,7 @@ class ProfileRepository @Inject constructor(
 ) {
 
     private val profileCollection = Firebase.firestore.collection(Const.PROFILE_COLLECTION)
+    private val hashCollection = Const.HASH_COLLECTION
 
     suspend fun getProfile(profileId: String) : Profile {
         val profileQuery = profileCollection
@@ -21,6 +22,41 @@ class ProfileRepository @Inject constructor(
             .get()
             .await()
         return profileQuery.toObject<Profile>()!!
+    }
+
+    suspend fun ifChatExist(profileId: String, memberId: String) : String? {
+        profileCollection
+            .document(profileId)
+            .collection(hashCollection)
+            .document("$profileId$memberId")
+            .get()
+            .await().also {
+                val doc = it.toObject<HashMap<String, String>>()
+                doc?.let {
+                    return it[memberId]
+                }
+            }
+        return null
+    }
+
+    suspend fun addChatToProfile(profileId: String, memberId: String, chatId : String) {
+        val profileHashMap : HashMap<String, String> = hashMapOf()
+        profileHashMap[memberId] = chatId
+        profileCollection
+            .document(profileId)
+            .collection(hashCollection)
+            .document("$profileId$memberId")
+            .set(profileHashMap)
+            .await()
+
+        val memberHashMap : HashMap<String, String> = hashMapOf()
+        memberHashMap[profileId] = chatId
+        profileCollection
+            .document(memberId)
+            .collection(hashCollection)
+            .document("$memberId$profileId")
+            .set(memberHashMap)
+            .await()
     }
 
     suspend fun getAllProfiles(): List<Profile> {

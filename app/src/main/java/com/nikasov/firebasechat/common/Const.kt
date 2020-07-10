@@ -7,6 +7,7 @@ object Const {
 
     // collections
     const val PROFILE_COLLECTION = "profiles"
+    const val HASH_COLLECTION = "hash"
     const val DIALOG_COLLECTION = "dialogs"
     const val MESSAGE_COLLECTION = "messages"
 
